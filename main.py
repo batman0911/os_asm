@@ -1,6 +1,7 @@
 import isort
 import sys
 import platform
+import importlib
 
 
 def get_stdlib_packages():
@@ -25,7 +26,32 @@ def task1():
     print(external_packages)
 
 
+def get_real_packages(package_names):
+    real_modules = set()
+    not_importable_modules = set()
+    for name in package_names:
+        try:
+            importlib.import_module(name)
+            del sys.modules[name]
+            real_modules.add(name)
+        except:
+            not_importable_modules.add(name)
+    return real_modules, not_importable_modules
+
+
+def get_real():
+    external_packages = get_stdlib_packages()
+    return get_real_packages(external_packages)
+
+
+def task2():
+    v = sys.version_info
+    real_modules, not_importable_modules = get_real()
+    print(f'These StdLib packages on Python-{v.major}.{v.minor}.{v.micro}/{platform.system()} {platform.release()} '
+          f'are not importable:')
+    print(not_importable_modules)
+
+
 if __name__ == '__main__':
-    # externel_packages = get_stdlib_packages()
-    # print(externel_packages)
-    task1()
+    # task1()
+    task2()
