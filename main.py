@@ -2,6 +2,7 @@ import isort
 import sys
 import platform
 import importlib
+from types import ModuleType
 
 
 def get_stdlib_packages():
@@ -52,6 +53,32 @@ def task2():
     print(not_importable_modules)
 
 
+def module_dependency(module_names, name):
+    dp_names = set()
+    dp_dict = dict((md, 0) for md in module_names)
+    for key, val in vars(sys.modules[name]).items():
+        if isinstance(val, ModuleType):
+            md_name = val.__name__
+
+            try:
+                index = md_name.index(".")
+                md_name = md_name[0:index]
+            except:
+                pass
+
+            dp_names.add(md_name)
+            dp_dict[md_name] = dp_dict[md_name] + 1
+            print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
+
+    return dp_names
+
+
+def task3():
+    real_modules = get_real()
+    module_dependency(real_modules, 'locale')
+
+
 if __name__ == '__main__':
     # task1()
-    task2()
+    # task2()
+    task3()
