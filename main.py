@@ -54,8 +54,11 @@ def task2():
 
 
 def module_dependency(module_names, name):
+    if name not in module_names:
+        raise Exception(f'{name} is not importable module')
     dp_names = set()
-    dp_dict = dict((md, 0) for md in module_names)
+
+    importlib.import_module(name)
     for key, val in vars(sys.modules[name]).items():
         if isinstance(val, ModuleType):
             md_name = val.__name__
@@ -67,15 +70,53 @@ def module_dependency(module_names, name):
                 pass
 
             dp_names.add(md_name)
-            dp_dict[md_name] = dp_dict[md_name] + 1
-            print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
+            # print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
+
+    del sys.modules[name]
 
     return dp_names
 
 
+def core_modules(real_modules):
+    # real_modules, _ = get_real()
+    core_module_names = set()
+    for r_name in real_modules:
+        dp_names = module_dependency(real_modules, r_name)
+        if len(dp_names) == 0:
+            core_module_names.add(r_name)
+
+    return core_module_names
+
+
+def most_dependent_modules(real_modules):
+    dp_dict = dict((name, 0) for name in real_modules)
+    for md_name in real_modules:
+        count = len(module_dependency(real_modules, md_name))
+        dp_dict[md_name] = count
+
+    sorted_dp_dict = dict(sorted(dp_dict.items(), key=lambda item: item[1], reverse=True))
+    i = 0
+    most_dependent_module_names = dict()
+    for k, v in sorted_dp_dict.items():
+        if i > 5:
+            break
+        most_dependent_module_names[k] = v
+        i = i + 1
+
+    return most_dependent_module_names
+
+
 def task3():
-    real_modules = get_real()
-    module_dependency(real_modules, 'locale')
+    real_modules, _ = get_real()
+    core_module_names = core_modules(real_modules)
+
+    dp_dict = most_dependent_modules(real_modules)
+
+    print(f'The following StdLib packages are most dependent:')
+    for k, v in dp_dict.items():
+        print(f'{k}: {v}')
+    print(f'The {len(core_module_names)} core packages are:')
+    print(core_module_names)
 
 
 if __name__ == '__main__':
