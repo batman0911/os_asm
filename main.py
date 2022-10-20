@@ -33,7 +33,6 @@ def get_real_packages(package_names):
     for name in package_names:
         try:
             importlib.import_module(name)
-            # del sys.modules[name]
             real_modules.add(name)
         except:
             not_importable_modules.add(name)
@@ -78,13 +77,10 @@ def module_dependency(module_names, name):
             dp_names.add(md_name)
             # print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
 
-    # del sys.modules[name]
-
     return dp_names
 
 
 def core_modules(real_modules):
-    # real_modules, _ = get_real()
     core_module_names = set()
     for r_name in real_modules:
         dp_names = module_dependency(real_modules, r_name)
