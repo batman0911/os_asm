@@ -33,7 +33,7 @@ def get_real_packages(package_names):
     for name in package_names:
         try:
             importlib.import_module(name)
-            del sys.modules[name]
+            # del sys.modules[name]
             real_modules.add(name)
         except:
             not_importable_modules.add(name)
@@ -52,13 +52,19 @@ def task2():
           f'are not importable:')
     print(not_importable_modules)
 
+    for name in real_modules:
+        del sys.modules[name]
+
 
 def module_dependency(module_names, name):
     if name not in module_names:
         raise Exception(f'{name} is not importable module')
     dp_names = set()
 
-    importlib.import_module(name)
+    try:
+        importlib.import_module(name)
+    except:
+        print(f'err name: {name}')
     for key, val in vars(sys.modules[name]).items():
         if isinstance(val, ModuleType):
             md_name = val.__name__
@@ -72,7 +78,7 @@ def module_dependency(module_names, name):
             dp_names.add(md_name)
             # print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
 
-    del sys.modules[name]
+    # del sys.modules[name]
 
     return dp_names
 
@@ -107,7 +113,8 @@ def most_dependent_modules(real_modules):
 
 
 def task3():
-    real_modules, _ = get_real()
+    real_modules, not_importable_modules = get_real()
+    # print(f'real modules: {real_modules}')
     core_module_names = core_modules(real_modules)
 
     dp_dict = most_dependent_modules(real_modules)
@@ -118,8 +125,16 @@ def task3():
     print(f'The {len(core_module_names)} core packages are:')
     print(core_module_names)
 
+    for name in real_modules:
+        del sys.modules[name]
+
 
 if __name__ == '__main__':
-    # task1()
-    # task2()
+    print(f'task1 -----------------')
+    task1()
+
+    print(f'task2 -----------------')
+    task2()
+
+    print(f'task3 -----------------')
     task3()
