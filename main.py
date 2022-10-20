@@ -126,11 +126,17 @@ def task3():
 
 
 if __name__ == '__main__':
-    print(f'task1 -----------------')
-    task1()
+    # print(f'task1 -----------------')
+    # task1()
+    #
+    # print(f'task2 -----------------')
+    # task2()
+    #
+    # print(f'task3 -----------------')
+    # task3()
+    import inspect
+    import fileinput
 
-    print(f'task2 -----------------')
-    task2()
-
-    print(f'task3 -----------------')
-    task3()
+    for name, obj in inspect.getmembers(fileinput):
+        if inspect.isclass(obj):
+            print(obj.__name__)
