@@ -93,22 +93,25 @@ def core_modules(real_modules):
     return core_module_names
 
 
+def get_custome_sorted_dict_by_value(m_dict, num, is_reverse):
+    sorted_dict = dict(sorted(m_dict.items(), key=lambda item: item[1], reverse=is_reverse))
+    i = 0
+    rd = dict()
+    for k, v in sorted_dict.items():
+        if i > num:
+            break
+        rd[k] = v
+        i = i + 1
+    return rd     
+
+
 def most_dependent_modules(real_modules):
     dp_dict = dict((name, 0) for name in real_modules)
     for md_name in real_modules:
         count = len(module_dependency(real_modules, md_name))
         dp_dict[md_name] = count
 
-    sorted_dp_dict = dict(sorted(dp_dict.items(), key=lambda item: item[1], reverse=True))
-    i = 0
-    most_dependent_module_names = dict()
-    for k, v in sorted_dp_dict.items():
-        if i > 5:
-            break
-        most_dependent_module_names[k] = v
-        i = i + 1
-
-    return most_dependent_module_names
+    return get_custome_sorted_dict_by_value(dp_dict, 5, True)
 
 
 def task3():
@@ -143,15 +146,7 @@ def module_class_count(module_names):
 
 
 def largest_module_by_class(md_class_count):
-    sorted_cl_dict = dict(sorted(md_class_count.items(), key=lambda item: item[1], reverse=True))
-    i = 0
-    largest_pack_cl = dict()
-    for k, v in sorted_cl_dict.items():
-        if i > 5:
-            break
-        largest_pack_cl[k] = v
-        i = i + 1
-    return largest_pack_cl
+    return get_custome_sorted_dict_by_value(md_class_count, 5, True)
 
 
 def no_class_modules(md_class_count):
@@ -162,6 +157,61 @@ def no_class_modules(md_class_count):
     return no_cls_set
 
 
+def explore_package(package_name):
+    importlib.import_module(package_name)
+    pack = sys.modules[package_name]
+    file_name = 'builtin_binary'
+    try:
+        file_name = pack.__file__
+        n = len(file_name)
+        # print(file_name[n-3:n])
+        if file_name[n-3:n] == '.py':
+            # print(file_name)
+            return package_name, file_name, 0
+        elif file_name[n-3:n] == '.so':
+            # print(file_name)
+            return package_name, file_name, 1
+        else:
+            raise Exception(f'unsupported file: {file_name}')
+    except:
+        return package_name, file_name, 2
+
+
+
+def get_py_modules(module_names):
+    py_mds = set()
+    for md in module_names:
+        p, f, t = explore_package(md)
+        if t == 0:
+            py_mds.add((p, f))
+    return py_mds
+
+
+def count_file_line(file_path):
+    count=0
+    for line in open(file_path, encoding="utf8"):
+        count+=1
+    return count
+
+
+def get_file_lines_dict(module_names):
+    md_lines = dict()
+    py_mds = get_py_modules(module_names)
+    for py_md in py_mds:
+        key = py_md[0]
+        num_lines = count_file_line(py_md[1])
+        md_lines[key] = num_lines
+    return md_lines
+
+
+def largest_module_by_line(md_lines):
+    return get_custome_sorted_dict_by_value(md_lines, 5, True)
+
+
+def smallest_module_by_line(md_lines):
+    return get_custome_sorted_dict_by_value(md_lines, 5, False)
+
+
 def task4():
     real_modules, _ = get_real()
     md_class_count = module_class_count(real_modules)
@@ -169,11 +219,21 @@ def task4():
     lg_md_cl = largest_module_by_class(md_class_count)
     n_cl_md = no_class_modules(md_class_count)
 
-    print(f'largest module by class: ')
+    md_lines = get_file_lines_dict(real_modules)
+    lg_md_line = largest_module_by_line(md_lines)
+    sml_md_line = smallest_module_by_line(md_lines)
+
+    print(f'largest modules by class: ')
     print(lg_md_cl)
 
-    print(f'module with no class: ')
+    print(f'modules with no class: ')
     print(n_cl_md)
+
+    print(f'largest modules by line: ')
+    print(lg_md_line)
+
+    print(f'smallest modules by line: ')
+    print(sml_md_line)
 
 
 if __name__ == '__main__':
@@ -185,4 +245,6 @@ if __name__ == '__main__':
     #
     # print(f'task3 -----------------')
     # task3()
+
+    print(f'task4 -----------------')
     task4()
