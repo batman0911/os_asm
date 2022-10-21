@@ -1,8 +1,11 @@
+import enum
+
 import isort
 import sys
 import platform
 import importlib
 from types import ModuleType
+import inspect
 
 
 def get_stdlib_packages():
@@ -51,8 +54,8 @@ def task2():
           f'are not importable:')
     print(not_importable_modules)
 
-    for name in real_modules:
-        del sys.modules[name]
+    # for name in real_modules:
+    #     del sys.modules[name]
 
 
 def module_dependency(module_names, name):
@@ -121,8 +124,28 @@ def task3():
     print(f'The {len(core_module_names)} core packages are:')
     print(core_module_names)
 
-    for name in real_modules:
-        del sys.modules[name]
+    # for name in real_modules:
+    #     del sys.modules[name]
+
+
+def module_class_count(module_names):
+    md_class_count = dict()
+    for md in module_names:
+        count = 0
+        for name, obj in inspect.getmembers(sys.modules[md]):
+            if inspect.isclass(obj):
+                if issubclass(obj, enum.Enum):
+                    continue
+                else:
+                    count = count + 1
+        md_class_count[md] = count
+    return md_class_count
+
+
+def task4():
+    real_modules, _ = get_real()
+    md_class_count = module_class_count(real_modules)
+    print(md_class_count)
 
 
 if __name__ == '__main__':
@@ -134,9 +157,4 @@ if __name__ == '__main__':
     #
     # print(f'task3 -----------------')
     # task3()
-    import inspect
-    import fileinput
-
-    for name, obj in inspect.getmembers(fileinput):
-        if inspect.isclass(obj):
-            print(obj.__name__)
+    task4()
