@@ -142,6 +142,24 @@ def module_class_count(module_names):
     return md_class_count
 
 
+def largest_module_by_class(md_class_count):
+    sorted_cl_dict = dict(sorted(md_class_count.items(), key=lambda item: item[1], reverse=True))
+    i = 0
+    largest_pack_cl = dict()
+    for k, v in sorted_cl_dict.items():
+        if i > 5:
+            break
+        largest_pack_cl[k] = v
+        i = i + 1
+    return largest_pack_cl
+
+def no_class_modules(md_class_count):
+    no_cls_set = set()
+    for k, v in md_class_count.items():
+        if v == 0:
+            no_cls_set.add(k)
+    return no_cls_set
+
 def task4():
     real_modules, _ = get_real()
     md_class_count = module_class_count(real_modules)
