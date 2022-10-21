@@ -164,12 +164,9 @@ def explore_package(package_name):
     try:
         file_name = pack.__file__
         n = len(file_name)
-        # print(file_name[n-3:n])
         if file_name[n-3:n] == '.py':
-            # print(file_name)
             return package_name, file_name, 0
         elif file_name[n-3:n] == '.so':
-            # print(file_name)
             return package_name, file_name, 1
         else:
             raise Exception(f'unsupported file: {file_name}')
@@ -215,7 +212,6 @@ def smallest_module_by_line(md_lines):
 def task4():
     real_modules, _ = get_real()
     md_class_count = module_class_count(real_modules)
-    # print(md_class_count)
     lg_md_cl = largest_module_by_class(md_class_count)
     n_cl_md = no_class_modules(md_class_count)
 
