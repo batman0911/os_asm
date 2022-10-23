@@ -398,20 +398,22 @@ def task6():
     plot(DG)
 
 
+def analyse_stdlib():
+    print(f'task1 -----------------')
+    task1()
+    
+    print(f'\ntask2 -----------------')
+    task2()
+    
+    print(f'\ntask3 -----------------')
+    task3()
+
+    print(f'\ntask4 -----------------')
+    task4()
+
+    print(f'\ntask5 -----------------')
+    task5()
+
+
 if __name__ == '__main__':
-    # print(f'task1 -----------------')
-    # task1()
-    
-    # print(f'\ntask2 -----------------')
-    # task2()
-    
-    # print(f'\ntask3 -----------------')
-    # task3()
-
-    # print(f'\ntask4 -----------------')
-    # task4()
-
-    # print(f'\ntask5 -----------------')
-    # task5()
-
-    task6()
+    analyse_stdlib()
