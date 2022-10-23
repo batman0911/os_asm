@@ -9,6 +9,8 @@ import inspect
 import ast
 import os
 import imp
+import networkx as nx
+import matplotlib.pyplot as plt
 
 def get_stdlib_packages():
     if sys.version_info.minor == 10:
@@ -22,6 +24,12 @@ def get_stdlib_packages():
             continue
         external_packages.append(name)
     return external_packages
+
+
+def get_version():
+    v = sys.version_info
+
+    return str(v.major) + str(v.minor) + str(v.micro)
 
 
 def task1():
@@ -81,7 +89,6 @@ def module_dependency(module_names, name):
 
             if md_name != name:
                 dp_names.append(md_name)
-            # print(f'key: {key}, type: {type(val)}, val: {md_name}, module: {md_name}')
 
     return dp_names
 
@@ -122,7 +129,6 @@ def most_dependent_modules(real_modules):
 
 def task3():
     real_modules, not_importable_modules = get_real()
-    # print(f'real modules: {real_modules}')
     core_module_names = core_modules(real_modules)
 
     dp_dict = most_dependent_modules(real_modules)
@@ -173,9 +179,6 @@ def list_file_in_module(module_name):
     file, pathname, description = imp.find_module(module_name)
 
     if os.path.isdir(pathname):
-        # return (pathname, 'dir', [os.path.splitext(module)[0]
-        #     for module in os.listdir(pathname)
-        #     if module.endswith(MODULE_EXTENSIONS)])
         file_list = list()
         for (root, dirs, files) in os.walk(pathname, topdown=True):
             if os.path.basename(root) == '__pycache__':
@@ -209,7 +212,6 @@ def explore_package(name):
         count_lines = 0
         count_classes = 0
         for file_name in file_list:
-            # file_path = os.path.join(module_dir, file_name + '.py')
             count_lines = count_lines + count_file_line(file_name)
             count_classes = count_classes + count_file_class(file_name)
         return (count_lines, count_classes, True)
@@ -365,19 +367,51 @@ def task5():
     print(rs[0:(len(rs) - 4)])
 
 
+def build_adj_list_md(md_map):
+    edges = list()
+
+    for k, v in md_map.items():
+        for name in v:
+            edges.append(tuple([k, name]))
+
+    return edges
+
+
+def define_graph(md_map):
+    edges = build_adj_list_md(md_map)
+    return nx.DiGraph(edges)
+
+
+def plot(DG):
+    plt.figure(3,figsize=(60,60)) 
+    nx.draw_spring(DG, edge_color="r", font_size=10, with_labels=True)
+    ax = plt.gca()
+    ax.margins(0.08)
+    plt.title(f'Module dependency graph of StdLib on python {get_version()}', fontsize=50)
+    plt.show()
+
+
+def task6():
+    real_modules, _ = get_real()
+    md_map = module_dependency_map(real_modules)
+    DG = define_graph(md_map)
+    plot(DG)
+
 
 if __name__ == '__main__':
-    print(f'task1 -----------------')
-    task1()
+    # print(f'task1 -----------------')
+    # task1()
     
-    print(f'\ntask2 -----------------')
-    task2()
+    # print(f'\ntask2 -----------------')
+    # task2()
     
-    print(f'\ntask3 -----------------')
-    task3()
+    # print(f'\ntask3 -----------------')
+    # task3()
 
-    print(f'\ntask4 -----------------')
-    task4()
+    # print(f'\ntask4 -----------------')
+    # task4()
 
-    print(f'\ntask5 -----------------')
-    task5()
+    # print(f'\ntask5 -----------------')
+    # task5()
+
+    task6()

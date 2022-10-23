@@ -19,6 +19,8 @@ members of this group. If you are doing the assignment on your own
 Question 3: Select a piece of code in your assignment solution that
 you have written, and explain:    
 
+
+
 (a) What does this piece of code do?
 
 (b) How does it work?
