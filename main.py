@@ -238,6 +238,7 @@ def module_dependency_map(modules):
         md_map[md] = module_dependency(modules, md)
     return md_map
 
+
 def build_adj_edge_graph(md_map):
     index_list = list()
 
@@ -263,19 +264,16 @@ def build_adj_edge_graph(md_map):
 
 
 def print_cycle(stack, v, circle_list):
-    # print(f'stack: {stack}')
     st2 = [stack.pop()]
     while st2[-1] != v:
         st2.append(stack.pop())
 
     rs = []
     while len(st2) > 0:
-        # print(st2[-1])
         rs.append(st2[-1])
         stack.append(st2[-1])
         st2.pop()
 
-    # print(f'cycle: {rs}')
     circle_list.append(rs)
 
 
