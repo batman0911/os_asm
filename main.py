@@ -1,16 +1,15 @@
-import enum
+import ast
+import imp
+import importlib
+import os
+import platform
+import sys
+from types import ModuleType
 
 import isort
-import sys
-import platform
-import importlib
-from types import ModuleType
-import inspect
-import ast
-import os
-import imp
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
+
 
 def get_stdlib_packages():
     if sys.version_info.minor == 10:
@@ -41,6 +40,9 @@ def task1():
 
 
 def get_real_packages(package_names):
+    """Loop through modules and try to import a single module
+        return list of real modules (importable) and list of 'not importable' modules
+    """
     real_modules = list()
     not_importable_modules = list()
     for name in package_names:
@@ -64,19 +66,13 @@ def task2():
           f'are not importable:')
     print(not_importable_modules)
 
-    # for name in real_modules:
-    #     del sys.modules[name]
-
 
 def module_dependency(module_names, name):
+    """Get the list of dependencies of a module 'name',
+        check if that module is in real module list"""
     if name not in module_names:
         raise Exception(f'{name} is not importable module')
     dp_names = list()
-
-    try:
-        importlib.import_module(name)
-    except:
-        print(f'err name: {name}')
     for key, val in vars(sys.modules[name]).items():
         if isinstance(val, ModuleType):
             md_name = val.__name__
@@ -94,6 +90,7 @@ def module_dependency(module_names, name):
 
 
 def core_modules(real_modules):
+    # Get list of modules with no dependencies
     core_module_names = list()
     for r_name in real_modules:
         dp_names = module_dependency(real_modules, r_name)
@@ -104,6 +101,10 @@ def core_modules(real_modules):
 
 
 def get_custom_sorted_dict_by_value(m_dict, num, it_idx, is_reverse):
+    """Sort the dictionary by its value
+        num: number of first elements to return
+        it_idx: index of value item if value is a tuple
+        is_reverse: reversed order or not"""
     if it_idx is not None:
         sorted_dict = dict(sorted(m_dict.items(), key=lambda item: item[1][it_idx], reverse=is_reverse))
     else:
@@ -119,6 +120,7 @@ def get_custom_sorted_dict_by_value(m_dict, num, it_idx, is_reverse):
 
 
 def most_dependent_modules(real_modules):
+    """Get 5 most dependent modules"""
     dp_dict = dict((name, 0) for name in real_modules)
     for md_name in real_modules:
         count = len(module_dependency(real_modules, md_name))
@@ -139,11 +141,11 @@ def task3():
     print(f'The {len(core_module_names)} core packages are:')
     print(core_module_names)
 
-    # for name in real_modules:
-    #     del sys.modules[name]
-
 
 def get_package_info(package_name):
+    """Return package name, file name and type of package
+        0: python file
+        otherwise: not python file"""
     pack = sys.modules[package_name]
     file_name = 'builtin_binary'
     try:
@@ -160,6 +162,7 @@ def get_package_info(package_name):
 
 
 def count_file_line(file_path):
+    """Count number of lines of a file by opening it"""
     count = 0
     for line in open(file_path, encoding="utf8"):
         count += 1
@@ -167,6 +170,7 @@ def count_file_line(file_path):
 
 
 def count_file_class(filename):
+    """Count number of custom classes of a python file"""
     with open(filename) as file:
         node = ast.parse(file.read())
 
@@ -175,6 +179,8 @@ def count_file_class(filename):
 
 
 def list_file_in_module(module_name):
+    """List all python files in a module
+        ignore __pycache__ folder"""
     MODULE_EXTENSIONS = ('.py')
     file, pathname, description = imp.find_module(module_name)
 
@@ -187,45 +193,49 @@ def list_file_in_module(module_name):
                 for filename in files:
                     if filename.endswith(MODULE_EXTENSIONS):
                         file_list.append(os.path.join(root, filename))
-        
-        return (pathname, 'dir', file_list)
+
+        return pathname, 'dir', file_list
 
 
     else:
-        return (pathname, 'file', [pathname])
-
+        return pathname, 'file', [pathname]
 
 
 def explore_package(name):
+    """Explore a package by name
+        return number of lines, number of classes (all files if module is a directory)
+            and type of module (False for binary and True for python module)"""
     md_name, md_file, md_type = get_package_info(name)
-    
+
     if md_type != 0:
-        return (0, 0, False)
-    
+        return 0, 0, False
+
     module_dir, module_type, file_list = list_file_in_module(name)
     if module_type == 'file':
         file_lines = count_file_line(module_dir)
         file_classes = count_file_class(module_dir)
-        return (file_lines, file_classes, True)
-    
+        return file_lines, file_classes, True
+
     else:
         count_lines = 0
         count_classes = 0
         for file_name in file_list:
             count_lines = count_lines + count_file_line(file_name)
             count_classes = count_classes + count_file_class(file_name)
-        return (count_lines, count_classes, True)
+        return count_lines, count_classes, True
 
 
 def build_module_info_dict(module_names):
+    """Building a dictionary with module name is the key and 'explore_package' is the value"""
     md_dict = dict()
     for md in module_names:
         md_dict[md] = explore_package(md)
-    
+
     return md_dict
 
 
 def modules_info_python_only(md_dict):
+    """Dictionary of module info for python modules only"""
     pmd = dict()
     for k, v in md_dict.items():
         if v[2]:
@@ -275,12 +285,15 @@ def task4():
     print(f'\n5 largest module by class: ')
     for k, v in lg_md_cls.items():
         print(f'{k}: {v[1]}')
-    
+
     print(f'\nmodules with no custom classes: ')
     print(n_md_cls)
 
 
 def module_dependency_map(modules):
+    """Building a dictionary of module dependencies
+        key: module name
+        value: its dependencies"""
     md_map = dict()
     for md in modules:
         md_map[md] = module_dependency(modules, md)
@@ -288,6 +301,9 @@ def module_dependency_map(modules):
 
 
 def build_adj_edge_graph(md_map):
+    """Convert dependency dictionary to map of number
+        building adjacency list of edges
+        packages as nodes and their dependencies as links between the nodes"""
     index_list = list()
 
     for k, v in md_map.items():
@@ -312,6 +328,7 @@ def build_adj_edge_graph(md_map):
 
 
 def print_cycle(stack, v, circle_list):
+    """print the cycle in graph"""
     st2 = [stack.pop()]
     while st2[-1] != v:
         st2.append(stack.pop())
@@ -326,6 +343,7 @@ def print_cycle(stack, v, circle_list):
 
 
 def process_DFS_tree(graph, stack, visited_vertices, circle_list):
+    """Build depth first search tree"""
     for v in graph[stack[-1]]:
         if visited_vertices[v] == 'in_stack':
             print_cycle(stack, v, circle_list)
@@ -339,6 +357,7 @@ def process_DFS_tree(graph, stack, visited_vertices, circle_list):
 
 
 def find_cycles(graph, circle_list):
+    """Find all cycles in a graph"""
     n = len(graph)
     visited = list()
     for i in range(n):
@@ -364,7 +383,7 @@ def task5():
         rs = f'{i}. '
         for v in item:
             rs = rs + index_list[v] + ' -> '
-    print(rs[0:(len(rs) - 4)])
+        print(rs[0:(len(rs) - 4)])
 
 
 def build_adj_list_md(md_map):
@@ -383,7 +402,7 @@ def define_graph(md_map):
 
 
 def plot(DG):
-    plt.figure(3,figsize=(60,60)) 
+    plt.figure(3, figsize=(60, 60))
     nx.draw_spring(DG, edge_color="r", font_size=10, with_labels=True)
     ax = plt.gca()
     ax.margins(0.08)
@@ -398,13 +417,19 @@ def task6():
     plot(DG)
 
 
+def remove_modules():
+    module_names, _ = get_real()
+    for name in module_names:
+        del sys.modules[name]
+
+
 def analyse_stdlib():
     print(f'task1 -----------------')
     task1()
-    
+
     print(f'\ntask2 -----------------')
     task2()
-    
+
     print(f'\ntask3 -----------------')
     task3()
 
@@ -413,6 +438,8 @@ def analyse_stdlib():
 
     print(f'\ntask5 -----------------')
     task5()
+
+    remove_modules()
 
 
 if __name__ == '__main__':
