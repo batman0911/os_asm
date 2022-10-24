@@ -1,3 +1,11 @@
+"""
+Template for the COMP1730/6730 project assignment, S2 2022.
+The assignment specification is available on the course web
+site, at https://cs.anu.edu.au/courses/comp1730/assessment/project/
+
+Collaborators: <list the UIDs of ALL members of your project group here>
+"""
+
 import ast
 import imp
 import importlib
@@ -151,9 +159,9 @@ def get_package_info(package_name):
     try:
         file_name = pack.__file__
         n = len(file_name)
-        if file_name[n-3:n] == '.py':
+        if file_name[n - 3:n] == '.py':
             return package_name, file_name, 0
-        elif file_name[n-3:n] == '.so':
+        elif file_name[n - 3:n] == '.so':
             return package_name, file_name, 1
         else:
             raise Exception(f'unsupported file: {file_name}')
@@ -442,5 +450,12 @@ def analyse_stdlib():
     remove_modules()
 
 
+# The section below will be executed when you run this file.
+# Use it to run tests of your analysis function on the data
+# files provided.
+
 if __name__ == '__main__':
+    NAME = 'John Smith'
+    ID = 'u1234567'
+    print(f'My name is {NAME}, my id is {ID}, and these are my findings for Project COMP1730.2022.S2')
     analyse_stdlib()

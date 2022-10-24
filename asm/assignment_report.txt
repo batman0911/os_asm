@@ -1,0 +1,63 @@
+
+Individual report for the COMP1730/6730 project assignment S2 2022
+-------------------------------------------------------------------
+
+Question 1: Write your name and ANU ID
+
+
+
+-------------------------------------------------------------------
+
+Question 2: If you are part of a group, write the ANU IDs of ALL
+members of this group. If you are doing the assignment on your own
+(not part of a group), just write "not part of a group".
+
+
+
+-------------------------------------------------------------------
+
+Question 3: Select a piece of code in your assignment solution that
+you have written, and explain:    
+
+def get_custom_sorted_dict_by_value(m_dict, num, it_idx, is_reverse):
+    if it_idx is not None:
+        sorted_dict = dict(sorted(m_dict.items(), key=lambda item: item[1][it_idx], reverse=is_reverse))
+    else:
+        sorted_dict = dict(sorted(m_dict.items(), key=lambda item: item[1], reverse=is_reverse))
+    i = 0
+    rd = dict()
+    for k, v in sorted_dict.items():
+        if i > num:
+            break
+        rd[k] = v
+        i = i + 1
+    return rd
+
+(a) What does this piece of code do?
+This function sorts the dictionary 'm_dict' with reversed order or not and takes 'num' first elements
+
+(b) How does it work?
+The 'm_dict' is the dictionary with form 
+    {
+        "key": (val_1, val_2, ...)
+    }
+Where 'key' is the module name and val_i is the value of number of dependencies (task 3) 
+or lines and classes (task 4).
+
+it_idx (item index) is the index of value that we want to sort. For example, in task 4, I build the 'm_dict'
+with 2 values (a tuple) of lines and classes. If we want to take 5 largest modules in terms of the number 
+of lines of code, let it_idx = 0 and num = 5, and reverse = True
+
+In some cases, we just have 1 value in value of key in m_dict then we can set it_idx = None
+
+The flow of this function:
+    - sort the dict with order by using builtin function 'sorted'
+    - loop to 'num' to get 'num' first elements
+
+(c) What other possible ways did you consider to implement this
+functionality, and why did you choose the one you did?
+The builtin 'sorted' function is used in my function, we can re-build the sorting algorithm but it takes 
+more energy. Furthermore, we can use other structure for inputs, for example, a list for 'm_dict' but using 
+dictionary is more convinient for printing and debugging.
+
+-------------------------------------------------------------------
