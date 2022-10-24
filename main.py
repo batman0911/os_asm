@@ -183,7 +183,7 @@ def count_file_class(filename):
             classes = [n for n in node.body if isinstance(n, ast.ClassDef)]
             return len(classes)
         except:
-            print(f'err in file: {filename}')
+            # print(f'err in file: {filename}')
             return 0
 
 
