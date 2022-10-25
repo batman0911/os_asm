@@ -177,11 +177,19 @@ def get_package_info(package_name):
 def count_file_line(file_path):
     """Count number of lines of a file by opening it"""
 
-    count = 0
-    for line in open(file_path, encoding="utf8"):
-        count += 1
-    return count
+    enc_list = ['utf-8', 'cp1252', 'latin-1']
 
+    for enc in enc_list:
+        try:
+            count = 0
+            for line in open(file_path, encoding=enc):
+                count += 1
+            return count
+        except:
+            # print(f'err file: {file_path} , enc: {enc}')
+            continue
+    
+    return 0
 
 def count_file_class(filename):
     """Count number of custom classes of a python file"""
@@ -250,7 +258,7 @@ def explore_package(name):
 
 def build_module_info_dict(module_names):
     """Building a dictionary with module name is the key and 'explore_package' is the value"""
-    
+
     md_dict = dict()
     for md in module_names:
         md_dict[md] = explore_package(md)
@@ -260,7 +268,7 @@ def build_module_info_dict(module_names):
 
 def modules_info_python_only(md_dict):
     """Dictionary of module info for python modules only"""
-    
+
     pmd = dict()
     for k, v in md_dict.items():
         if v[2]:
@@ -319,7 +327,7 @@ def module_dependency_map(modules):
     """Building a dictionary of module dependencies
         key: module name
         value: its dependencies"""
-    
+
     md_map = dict()
     for md in modules:
         md_map[md] = module_dependency(modules, md)
@@ -330,7 +338,7 @@ def build_adj_edge_graph(md_map):
     """Convert dependency dictionary to map of number
         building adjacency list of edges
         packages as nodes and their dependencies as links between the nodes"""
-    
+
     index_list = list()
 
     for k, v in md_map.items():
@@ -356,7 +364,7 @@ def build_adj_edge_graph(md_map):
 
 def print_cycle(stack, v, circle_list):
     """print the cycle in graph"""
-    
+
     st2 = [stack.pop()]
     while st2[-1] != v:
         st2.append(stack.pop())
@@ -372,7 +380,7 @@ def print_cycle(stack, v, circle_list):
 
 def process_DFS_tree(graph, stack, visited_vertices, circle_list):
     """Build depth first search tree"""
-    
+
     for v in graph[stack[-1]]:
         if visited_vertices[v] == 'in_stack':
             print_cycle(stack, v, circle_list)
@@ -387,7 +395,7 @@ def process_DFS_tree(graph, stack, visited_vertices, circle_list):
 
 def find_cycles(graph, circle_list):
     """Find all cycles in a graph"""
-    
+
     n = len(graph)
     visited = list()
     for i in range(n):
@@ -413,7 +421,8 @@ def task5():
         rs = f'{i}. '
         for v in item:
             rs = rs + index_list[v] + ' -> '
-        print(rs[0:(len(rs) - 4)])
+        print(rs + index_list[item[0]])
+        i += 1
 
 
 def build_adj_list_md(md_map):

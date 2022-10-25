@@ -7,17 +7,16 @@ import platform
 import sys
 from types import ModuleType
 
-# import isort
-# import matplotlib.pyplot as plt
-# import networkx as nx
+import isort
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def get_stdlib_packages():
     if sys.version_info.minor == 10:
         module_names = sys.stdlib_module_names
     else:
-        # module_names = isort.stdlibs.py38.stdlib
-        module_names = []
+        module_names = isort.stdlibs.py38.stdlib
 
     external_packages = list()
     for name in module_names:
@@ -165,10 +164,20 @@ def get_package_info(package_name):
 
 def count_file_line(file_path):
     """Count number of lines of a file by opening it"""
-    count = 0
-    for line in open(file_path, encoding="utf8"):
-        count += 1
-    return count
+
+    enc_list = ['utf-8', 'cp1252', 'latin-1']
+
+    for enc in enc_list:
+        try:
+            count = 0
+            for line in open(file_path, encoding=enc):
+                count += 1
+            return count
+        except:
+            # print(f'err file: {file_path} , enc: {enc}')
+            continue
+
+    return 0
 
 
 def count_file_class(filename):
@@ -392,7 +401,8 @@ def task5():
         rs = f'{i}. '
         for v in item:
             rs = rs + index_list[v] + ' -> '
-        print(rs[0:(len(rs) - 4)])
+        print(rs + index_list[item[0]])
+        i += 1
 
 
 def build_adj_list_md(md_map):
@@ -405,25 +415,25 @@ def build_adj_list_md(md_map):
     return edges
 
 
-# def define_graph(md_map):
-#     edges = build_adj_list_md(md_map)
-#     return nx.DiGraph(edges)
+def define_graph(md_map):
+    edges = build_adj_list_md(md_map)
+    return nx.DiGraph(edges)
 
 
-# def plot(DG):
-#     plt.figure(3, figsize=(60, 60))
-#     nx.draw_spring(DG, edge_color="r", font_size=10, with_labels=True)
-#     ax = plt.gca()
-#     ax.margins(0.08)
-#     plt.title(f'Module dependency graph of StdLib on python {get_version()}', fontsize=50)
-#     plt.show()
+def plot(DG):
+    plt.figure(3, figsize=(60, 60))
+    nx.draw_spring(DG, edge_color="r", font_size=10, with_labels=True)
+    ax = plt.gca()
+    ax.margins(0.08)
+    plt.title(f'Module dependency graph of StdLib on python {get_version()}', fontsize=50)
+    plt.show()
 
 
-# def task6():
-#     real_modules, _ = get_real()
-#     md_map = module_dependency_map(real_modules)
-#     DG = define_graph(md_map)
-#     plot(DG)
+def task6():
+    real_modules, _ = get_real()
+    md_map = module_dependency_map(real_modules)
+    DG = define_graph(md_map)
+    plot(DG)
 
 
 def remove_modules():
@@ -433,20 +443,20 @@ def remove_modules():
 
 
 def analyse_stdlib():
-    # print(f'task1 -----------------')
-    # task1()
+    print(f'task1 -----------------')
+    task1()
 
-    # print(f'\ntask2 -----------------')
-    # task2()
+    print(f'\ntask2 -----------------')
+    task2()
 
-    # print(f'\ntask3 -----------------')
-    # task3()
+    print(f'\ntask3 -----------------')
+    task3()
 
     print(f'\ntask4 -----------------')
     task4()
 
-    # print(f'\ntask5 -----------------')
-    # task5()
+    print(f'\ntask5 -----------------')
+    task5()
 
     remove_modules()
 
